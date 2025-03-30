@@ -27,11 +27,12 @@ def start_simulation():
     sim_speed = float(params.get("sim_speed", 1.0))
     source_x = int(params.get("source_x", width // 2))
     source_y = int(params.get("source_y", height // 2))
-    dx = float(params.get("dx", 1.0))  # nuevo parámetro
-    dt = float(params.get("dt", 0.1))  # nuevo parámetro
+    dx = float(params.get("dx", 1.0))
+    dt = float(params.get("dt", 0.1))
+    boundary = params.get("boundary", "Neumann")
     
     simulation = SimulationEngine(width=width, height=height, alpha=alpha,
-                                  heat_temp=heat_temp, ambient=ambient, dx=dx, dt=dt, source_x=source_x, source_y=source_y )
+                                  heat_temp=heat_temp, ambient=ambient, dx=dx, dt=dt, source_x=source_x, source_y=source_y, boundary=boundary )
     simulation.sim_speed = sim_speed
     simulation.running = True
     simulation.paused = False
@@ -41,7 +42,7 @@ def start_simulation():
             with simulation_lock:
                 if not simulation.paused:
                     percentage = simulation.step()
-                    if percentage >= 100:
+                    if percentage >= 99.0:
                         simulation.running = False
                         break
             time.sleep(0.05 / sim_speed)

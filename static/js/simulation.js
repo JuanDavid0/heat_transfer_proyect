@@ -16,6 +16,7 @@ function startSimulation() {
     let source_y = document.getElementById("source_y").value;
     let dx = document.getElementById("dx").value; // nuevo campo
     let dt = document.getElementById("dt").value; // nuevo campo
+    let boundary = document.getElementById("boundary").value;
     
     fetch("/start", {
         method: "POST",
@@ -30,7 +31,8 @@ function startSimulation() {
             source_x: source_x,
             source_y: source_y,
             dx: dx,
-            dt: dt
+            dt: dt,
+            boundary: boundary
         })
     })
     .then(response => response.json())

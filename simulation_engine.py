@@ -2,7 +2,7 @@
 import numpy as np
 
 class SimulationEngine:
-    def __init__(self, width=50, height=50, alpha=0.1, heat_temp=100.0, ambient=20.0, dx=1.0, dt=0.1, source_x=None, source_y=None):
+    def __init__(self, width=50, height=50, alpha=0.1, heat_temp=100.0, ambient=20.0, dx=1.0, dt=0.1, source_x=None, source_y=None, boundary="Neumann"):
         self.width = width
         self.height = height
         self.alpha = alpha
@@ -30,6 +30,9 @@ class SimulationEngine:
         # Umbral para considerar una celda "calentada"
         self.threshold = ambient + 0.95 * (heat_temp - ambient)
         
+        # Condición de contorno: "Dirichlet" o "Neumann"
+        self.boundary = boundary
+        
         # Flags de control
         self.running = False
         self.paused = False
@@ -46,11 +49,19 @@ class SimulationEngine:
             / (self.dx ** 2)
         )
         
-        # Imponer condiciones de contorno Neumann (aisladas)
-        T_new[0, :] = T_new[1, :]
-        T_new[-1, :] = T_new[-2, :]
-        T_new[:, 0] = T_new[:, 1]
-        T_new[:, -1] = T_new[:, -2]
+        # Aplicar condiciones de contorno según el modo seleccionado
+        if self.boundary == "Neumann":
+            # Condiciones Neumann (aisladas): copiar celda adyacente
+            T_new[0, :] = T_new[1, :]
+            T_new[-1, :] = T_new[-2, :]
+            T_new[:, 0] = T_new[:, 1]
+            T_new[:, -1] = T_new[:, -2]
+        elif self.boundary == "Dirichlet":
+            # Condiciones Dirichlet (fijas): fijar al valor ambiente
+            T_new[0, :] = self.ambient
+            T_new[-1, :] = self.ambient
+            T_new[:, 0] = self.ambient
+            T_new[:, -1] = self.ambient
         
         # Forzar la fuente de calor en el centro
         T_new[self.source_pos] = self.heat_temp
