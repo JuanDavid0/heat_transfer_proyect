@@ -64,13 +64,19 @@ function getStatus() {
 function drawSimulation(matrix) {
     let rows = matrix.length;
     let cols = matrix[0].length;
+    
     canvas.width = cols * cellSize + 2 * padding;
     canvas.height = rows * cellSize + 2 * padding;
-    for(let i = 0; i < rows; i++){
-        for(let j = 0; j < cols; j++){
+    
+    // Suponiendo que la temperatura ambiente y de la fuente son fijas (20 y, por ejemplo, 200)
+    let ambient = 20;
+    let heat_temp = 200;
+    
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
             let temp = matrix[i][j];
-            // Suponiendo una temperatura ambiente de 20 y fuente en 100
-            let t_norm = (temp - 20) / (100 - 20);
+            // Normalización fija: con ambient y heat_temp
+            let t_norm = (temp - ambient) / (heat_temp - ambient);
             t_norm = Math.min(Math.max(t_norm, 0), 1);
             let color = temperatureToColor(t_norm);
             ctx.fillStyle = color;
@@ -80,22 +86,20 @@ function drawSimulation(matrix) {
 }
 
 function temperatureToColor(t_norm) {
+    t_norm = Math.max(0, Math.min(1, t_norm));
     let r, g, b;
     if (t_norm < 0.5) {
-        // De azul a cian
         let ratio = t_norm / 0.5;
         r = 0;
         g = Math.floor(ratio * 255);
         b = 255;
     } else if (t_norm < 0.8) {
-        // De cian a amarillo
-        let ratio = (t_norm - 0.5) / 0.3;
+        let ratio = (t_norm - 0.5) / (0.8 - 0.5);
         r = Math.floor(ratio * 255);
         g = 255;
         b = Math.floor((1 - ratio) * 255);
     } else {
-        // De amarillo a rojo
-        let ratio = (t_norm - 0.8) / 0.2;
+        let ratio = (t_norm - 0.8) / (1 - 0.8);
         r = 255;
         g = Math.floor((1 - ratio) * 255);
         b = 0;

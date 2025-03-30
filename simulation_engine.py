@@ -21,7 +21,7 @@ class SimulationEngine:
         self.current_time = 0.0
         
         # Umbral para considerar una celda "calentada"
-        self.threshold = ambient + 0.80 * (heat_temp - ambient)
+        self.threshold = ambient + 0.95 * (heat_temp - ambient)
         
         # Flags de control
         self.running = False
