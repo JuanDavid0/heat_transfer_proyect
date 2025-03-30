@@ -1,0 +1,48 @@
+# Node.js dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Python dependencies
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+.env
+
+# Virtual environment
+venv/
+.env/
+env/
+
+# Build artifacts
+dist/
+build/
+*.log
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.iml
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
+*.bak
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# MATLAB files (if applicable)
+*.asv
+
+# Other
+*.out
+*.exe
+*.dll
+*.class

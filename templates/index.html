@@ -1,0 +1,31 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Simulación de Transferencia de Calor</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>Simulación de Transferencia de Calor</h1>
+    <div id="config">
+        <label>Ancho (celdas): <input type="number" id="width" value="50"></label>
+        <label>Alto (celdas): <input type="number" id="height" value="50"></label>
+        <label>Coeficiente térmico (α): <input type="number" step="0.01" id="alpha" value="0.1"></label>
+        <label>Temperatura de la fuente: <input type="number" id="heat_temp" value="100"></label>
+        <label>Velocidad de simulación: <input type="number" step="0.1" id="sim_speed" value="1.0"></label>
+        <button onclick="startSimulation()">Iniciar Simulación</button>
+        <button onclick="pauseSimulation()">Pausar</button>
+        <button onclick="resumeSimulation()">Reanudar</button>
+        <button onclick="showGraph()">Ver Gráficos</button>
+    </div>
+    <div id="simulation">
+        <canvas id="simCanvas" width="520" height="520"></canvas>
+    </div>
+    <div id="info">
+        <p id="percentage">Área Calentada: 0%</p>
+        <p id="time">Tiempo: 0.0 s</p>
+    </div>
+    <script src="{{ url_for('static', filename='js/simulation.js') }}"></script>
+</body>
+</html>

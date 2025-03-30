@@ -1,0 +1,19 @@
+/* static/css/styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+#config {
+    margin-bottom: 20px;
+}
+#config label {
+    margin-right: 10px;
+}
+#simulation {
+    border: 1px solid #ccc;
+    display: inline-block;
+    margin-top: 20px;
+}
+#info {
+    margin-top: 10px;
+}
