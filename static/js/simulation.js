@@ -8,7 +8,7 @@ let simulationInterval = null;
 function startSimulation() {
     let width = document.getElementById("width").value;
     let height = document.getElementById("height").value;
-    let alpha = document.getElementById("alpha").value;
+    let alpha = document.getElementById("material").value;
     let heat_temp = document.getElementById("heat_temp").value;
     let sim_speed = document.getElementById("sim_speed").value;
     
@@ -79,10 +79,27 @@ function drawSimulation(matrix) {
     }
 }
 
-function temperatureToColor(t) {
-    let r = Math.floor(t * 255);
-    let b = Math.floor((1 - t) * 255);
-    let g = 0;
+function temperatureToColor(t_norm) {
+    let r, g, b;
+    if (t_norm < 0.5) {
+        // De azul a cian
+        let ratio = t_norm / 0.5;
+        r = 0;
+        g = Math.floor(ratio * 255);
+        b = 255;
+    } else if (t_norm < 0.8) {
+        // De cian a amarillo
+        let ratio = (t_norm - 0.5) / 0.3;
+        r = Math.floor(ratio * 255);
+        g = 255;
+        b = Math.floor((1 - ratio) * 255);
+    } else {
+        // De amarillo a rojo
+        let ratio = (t_norm - 0.8) / 0.2;
+        r = 255;
+        g = Math.floor((1 - ratio) * 255);
+        b = 0;
+    }
     return "rgb(" + r + "," + g + "," + b + ")";
 }
 

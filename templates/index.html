@@ -1,17 +1,32 @@
 <!-- templates/index.html -->
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Simulación de Transferencia de Calor</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
+
 <body>
     <h1>Simulación de Transferencia de Calor</h1>
     <div id="config">
         <label>Ancho (celdas): <input type="number" id="width" value="50"></label>
         <label>Alto (celdas): <input type="number" id="height" value="50"></label>
-        <label>Coeficiente térmico (α): <input type="number" step="0.01" id="alpha" value="0.1"></label>
+        <label>Material:
+            <select id="material">
+                <option value="0.8">Cobre</option>
+                <option value="0.3">Acero Inoxidable</option>
+                <option value="0.9">Aluminio</option>
+                <option value="0.95">Plata</option>
+                <option value="0.85">Oro</option>
+                <option value="0.5">Hierro</option>
+                <option value="0.4">Latón</option>
+                <option value="0.35">Bronce</option>
+                <option value="0.2">Vidrio</option>
+                <option value="0.1">Madera</option>
+            </select>
+        </label>
         <label>Temperatura de la fuente: <input type="number" id="heat_temp" value="100"></label>
         <label>Velocidad de simulación: <input type="number" step="0.1" id="sim_speed" value="1.0"></label>
         <button onclick="startSimulation()">Iniciar Simulación</button>
@@ -28,4 +43,5 @@
     </div>
     <script src="{{ url_for('static', filename='js/simulation.js') }}"></script>
 </body>
+
 </html>

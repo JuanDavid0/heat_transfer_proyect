@@ -21,7 +21,7 @@ class SimulationEngine:
         self.current_time = 0.0
         
         # Umbral para considerar una celda "calentada"
-        self.threshold = ambient + 0.99 * (heat_temp - ambient)
+        self.threshold = ambient + 0.80 * (heat_temp - ambient)
         
         # Flags de control
         self.running = False
@@ -51,10 +51,12 @@ class SimulationEngine:
 
         self.current_time += self.dt
 
-        # Calcular porcentaje de celdas que alcanzan el umbral
-        heated_cells = (self.T >= self.threshold).sum()
-        total_cells = self.width * self.height
-        percentage = (heated_cells / total_cells) * 100
+        # Calcular el promedio normalizado (0% cuando toda la placa está a ambiente, 100% cuando alcanza la fuente)
+        normalized = (self.T - self.ambient) / (self.heat_temp - self.ambient)
+        # Aseguramos que los valores estén entre 0 y 1 y luego calculamos el promedio
+        normalized = normalized.clip(0, 1)
+        percentage = np.mean(normalized) * 100
+
         self.percentage_history.append(percentage)
         self.time_history.append(self.current_time)
         return percentage
