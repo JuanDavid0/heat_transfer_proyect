@@ -23,10 +23,15 @@ def start_simulation():
     height = int(params.get("height", 50))
     alpha = float(params.get("alpha", 0.1))
     heat_temp = float(params.get("heat_temp", 100.0))
+    ambient = float(params.get("ambient", 20.0))
     sim_speed = float(params.get("sim_speed", 1.0))
+    source_x = int(params.get("source_x", width // 2))
+    source_y = int(params.get("source_y", height // 2))
+    dx = float(params.get("dx", 1.0))  # nuevo parámetro
+    dt = float(params.get("dt", 0.1))  # nuevo parámetro
     
     simulation = SimulationEngine(width=width, height=height, alpha=alpha,
-                                  heat_temp=heat_temp, ambient=20.0, dx=1.0, dt=0.1)
+                                  heat_temp=heat_temp, ambient=ambient, dx=dx, dt=dt, source_x=source_x, source_y=source_y )
     simulation.sim_speed = sim_speed
     simulation.running = True
     simulation.paused = False

@@ -2,7 +2,7 @@
 import numpy as np
 
 class SimulationEngine:
-    def __init__(self, width=50, height=50, alpha=0.1, heat_temp=100.0, ambient=20.0, dx=1.0, dt=0.1):
+    def __init__(self, width=50, height=50, alpha=0.1, heat_temp=100.0, ambient=20.0, dx=1.0, dt=0.1, source_x=None, source_y=None):
         self.width = width
         self.height = height
         self.alpha = alpha
@@ -11,10 +11,17 @@ class SimulationEngine:
         self.dx = dx
         self.dt = dt
         
-        # Inicializa la placa con la temperatura ambiente
         self.T = np.full((height, width), ambient, dtype=np.float64)
-        self.center = (height // 2, width // 2)
-        self.T[self.center] = heat_temp
+        
+        # Inicializa la placa con la temperatura ambiente
+        if source_x is None:
+            source_x = width // 2
+        if source_y is None:
+            source_y = height // 2
+        self.source_pos = (source_y, source_x)  # Recordar: fila (Y), columna (X)
+        
+        # Inicializar la fuente de calor
+        self.T[self.source_pos] = heat_temp
         
         self.percentage_history = []
         self.time_history = []
@@ -46,7 +53,7 @@ class SimulationEngine:
         T_new[:, -1] = T_new[:, -2]
         
         # Forzar la fuente de calor en el centro
-        T_new[self.center] = self.heat_temp
+        T_new[self.source_pos] = self.heat_temp
         self.T = T_new
 
         self.current_time += self.dt

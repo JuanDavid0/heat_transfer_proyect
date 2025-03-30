@@ -10,7 +10,12 @@ function startSimulation() {
     let height = document.getElementById("height").value;
     let alpha = document.getElementById("material").value;
     let heat_temp = document.getElementById("heat_temp").value;
+    let ambient = document.getElementById("ambient").value;
     let sim_speed = document.getElementById("sim_speed").value;
+    let source_x = document.getElementById("source_x").value;
+    let source_y = document.getElementById("source_y").value;
+    let dx = document.getElementById("dx").value; // nuevo campo
+    let dt = document.getElementById("dt").value; // nuevo campo
     
     fetch("/start", {
         method: "POST",
@@ -20,7 +25,12 @@ function startSimulation() {
             height: height,
             alpha: alpha,
             heat_temp: heat_temp,
-            sim_speed: sim_speed
+            ambient: ambient,
+            sim_speed: sim_speed,
+            source_x: source_x,
+            source_y: source_y,
+            dx: dx,
+            dt: dt
         })
     })
     .then(response => response.json())

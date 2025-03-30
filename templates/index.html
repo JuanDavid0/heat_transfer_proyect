@@ -28,6 +28,22 @@
             </select>
         </label>
         <label>Temperatura de la fuente: <input type="number" id="heat_temp" value="200"></label>
+        <label>Temperatura Ambiente:
+            <input type="number" id="ambient" value="20">
+        </label>
+        <label>Posición de la Fuente (X):
+            <input type="number" id="source_x" value="25" min="0">
+        </label>
+        <label>Posición de la Fuente (Y):
+            <input type="number" id="source_y" value="25" min="0">
+        </label>
+        <label>Tamaño de la Celda (dx):
+            <input type="number" id="dx" value="1.0" step="0.1" min="0.1">
+        </label>
+        <label>Paso de Tiempo (dt):
+            <input type="number" id="dt" value="0.1" step="0.01" min="0.01">
+        </label>
+
         <label>Velocidad de simulación: <input type="number" step="0.1" id="sim_speed" value="30"></label>
         <button onclick="startSimulation()">Iniciar Simulación</button>
         <button onclick="pauseSimulation()">Pausar</button>
