@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Gráficas de la Simulación</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+    <link rel="stylesheet" href="../static/css/stylegraph.css">
+</head>
+
+<body>
+    <h1>Resultados de la Simulación</h1>
+    <div class="grid-container">
+        <div class="grid-item">
+            <h3>Temperatura Promedio vs Tiempo</h3>
+            <img src="data:image/png;base64,{{ images['avg_temp'] }}" alt="Temperatura Promedio">
+        </div>
+        <div class="grid-item">
+            <h3>Área Calentada vs Tiempo</h3>
+            <img src="data:image/png;base64,{{ images['area_percentage'] }}" alt="Área Calentada">
+        </div>
+        <div class="grid-item">
+            <h3>Histograma de Temperaturas</h3>
+            <img src="data:image/png;base64,{{ images['histogram'] }}" alt="Histograma">
+        </div>
+        <div class="grid-item">
+            <h3>Mapa de Calor Final</h3>
+            <img src="data:image/png;base64,{{ images['heatmap'] }}" alt="Mapa de Calor">
+        </div>
+    </div>
+</body>
+
+</html>

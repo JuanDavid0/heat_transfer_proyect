@@ -82,27 +82,72 @@ def get_status():
     else:
         return jsonify({"error": "No simulation running"})
 
+from flask import render_template, jsonify
+import matplotlib.pyplot as plt
+import io, base64
+
 @app.route('/graph', methods=['GET'])
 def show_graph():
-    # Genera un gráfico con matplotlib y lo retorna como imagen en base64
-    import io, base64, matplotlib.pyplot as plt
-    matplotlib.use('Agg')  # Usar un backend no interactivo   
     global simulation
-    if simulation:
-        plt.figure()
-        plt.plot(simulation.time_history, simulation.percentage_history, marker='o')
-        plt.xlabel("Tiempo")
-        plt.ylabel("Porcentaje de Área Calentada")
-        plt.title("Evolución del Calor")
-        plt.grid(True)
-        buf = io.BytesIO()
-        plt.savefig(buf, format='png')
-        plt.close()
-        buf.seek(0)
-        image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
-        return f"<img src='data:image/png;base64,{image_base64}'/>"
-    else:
-        return "No hay datos de simulación disponibles"
+    # Verificar que la simulación haya finalizado
+    if simulation is None or simulation.running:
+        return "La simulación aún no ha finalizado.", 400
+
+    images = {}
+
+    # Gráfico 1: Evolución de la Temperatura Promedio vs. Tiempo
+    plt.figure(figsize=(5, 4))
+    plt.plot(simulation.time_history, simulation.avg_temp_history, marker='o', color='blue')
+    plt.xlabel("Tiempo (s)")
+    plt.ylabel("Temperatura Promedio (°C)")
+    plt.title("Evolución de la Temperatura Promedio")
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    images['avg_temp'] = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    # Gráfico 2: Evolución del Área Calentada vs. Tiempo
+    plt.figure(figsize=(5, 4))
+    plt.plot(simulation.time_history, simulation.percentage_history, marker='o', color='red')
+    plt.xlabel("Tiempo (s)")
+    plt.ylabel("Área Calentada (%)")
+    plt.title("Evolución del Área Calentada")
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    images['area_percentage'] = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    # Gráfico 3: Histograma de la Distribución de Temperaturas Final
+    plt.figure(figsize=(5, 4))
+    plt.hist(simulation.T.flatten(), bins=20, color='orange', edgecolor='black')
+    plt.xlabel("Temperatura (°C)")
+    plt.ylabel("Número de celdas")
+    plt.title("Histograma de Temperaturas")
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    images['histogram'] = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    # Gráfico 4: Mapa de Calor Final
+    plt.figure(figsize=(5, 4))
+    plt.imshow(simulation.T, cmap='hot', origin='lower')
+    plt.colorbar(label="Temperatura (°C)")
+    plt.title("Mapa de Calor Final")
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    images['heatmap'] = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    # Renderizar la plantilla 'graph.html' y pasar los datos
+    return render_template("graph.html", images=images)
 
 if __name__ == '__main__':
     app.run(debug=True)

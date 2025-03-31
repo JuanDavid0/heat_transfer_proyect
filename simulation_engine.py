@@ -77,4 +77,11 @@ class SimulationEngine:
 
         self.percentage_history.append(percentage)
         self.time_history.append(self.current_time)
+        
+            # Registro de la temperatura promedio
+        avg_temp = np.mean(self.T)
+        if not hasattr(self, 'avg_temp_history'):
+            self.avg_temp_history = []
+        self.avg_temp_history.append(avg_temp)
+        
         return percentage
