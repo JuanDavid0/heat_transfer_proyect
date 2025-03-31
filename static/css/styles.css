@@ -1,19 +1,134 @@
-/* static/css/styles.css */
-body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-}
-#config {
+/* Reset básico y tipografía */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e9ecef;
+    color: #343a40;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Encabezado */
+  header {
+    text-align: center;
+    padding: 20px 0;
+    background-color: #343a40;
+    color: #fff;
+  }
+  
+  /* Contenedor principal ocupa el 100% de la altura */
+  .container {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 80px); /* descontando el header */
+    padding: 20px;
+  }
+  
+  /* Sección de configuración: 25% del ancho */
+  #config {
+    width: 25%;
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    overflow-y: auto;
+  }
+  
+  /* Sección de simulación: 75% del ancho y centrado */
+  #simulation-container {
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Configuración de grupos */
+  .config-group {
     margin-bottom: 20px;
-}
-#config label {
-    margin-right: 10px;
-}
-#simulation {
-    border: 1px solid #ccc;
-    display: inline-block;
-    margin-top: 20px;
-}
-#info {
-    margin-top: 10px;
-}
+  }
+  
+  .config-group h2 {
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 5px;
+    color: #007bff;
+  }
+  
+  #config label {
+    display: block;
+    margin-bottom: 15px;
+    font-size: 0.95em;
+  }
+  
+  /* Inputs y sliders */
+  #config input[type="number"],
+  #config select,
+  #config input[type="range"] {
+    margin-left: 10px;
+    padding: 5px;
+    font-size: 1em;
+  }
+  
+  /* Botones */
+  .config-actions {
+    text-align: center;
+  }
+  
+  .config-actions button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+  }
+  
+  .config-actions button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Área de simulación */
+  #simulation {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    width: fit-content;
+  }
+  
+  /* Ajuste del canvas para que se centre */
+  #simCanvas {
+    display: block;
+    margin: 0 auto;
+  }
+  
+  /* Sección de información con mayor énfasis */
+  #info {
+    text-align: center;
+    font-size: 1.2em;
+    color: #fff;
+    background: linear-gradient(90deg, #007bff, #00c851);
+    padding: 15px;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  

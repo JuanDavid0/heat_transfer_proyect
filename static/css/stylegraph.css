@@ -1,33 +1,71 @@
+/* Fuente y fondo general */
 body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    background-color: #f4f4f4;
-  }
-  h1 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  .grid-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-  .grid-item {
-    background: #fff;
-    padding: 10px;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  .grid-item h3 {
-    margin-top: 0;
-    font-size: 1.1em;
-    text-align: center;
-  }
-  .grid-item img {
-    width: 100%;
-    height: auto;
-    display: block;
-    margin: 0 auto;
-  }
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #eef2f7;
+  color: #333;
+  margin: 0;
+  padding: 20px;
+}
+
+/* Encabezado */
+header {
+  text-align: center;
+  padding: 20px 0;
+  background-color: #343a40;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+/* Main container centrado */
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Grid responsivo */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  width: 100%;
+  padding: 10px;
+}
+
+
+/* Estilo para cada tarjeta de gráfica */
+.grid-item {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.grid-item:hover {
+  transform: translateY(-5px);
+}
+
+.grid-item h3 {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 1.15em;
+  color: #007bff;
+}
+
+/* Imagen responsiva centrada */
+.grid-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  border-radius: 3px;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 0.9em;
+  color: #777;
+}

@@ -1,33 +1,40 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <meta charset="utf-8">
-    <title>Gráficas de la Simulación</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
-    <link rel="stylesheet" href="../static/css/stylegraph.css">
+  <meta charset="utf-8">
+  <title>Gráficas de la Simulación</title>
+  <!-- Normalize para reiniciar estilos y una tipografía moderna -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/stylegraph.css') }}">
 </head>
-
 <body>
+  <header>
     <h1>Resultados de la Simulación</h1>
+  </header>
+  
+  <main>
     <div class="grid-container">
-        <div class="grid-item">
-            <h3>Temperatura Promedio vs Tiempo</h3>
-            <img src="data:image/png;base64,{{ images['avg_temp'] }}" alt="Temperatura Promedio">
-        </div>
-        <div class="grid-item">
-            <h3>Área Calentada vs Tiempo</h3>
-            <img src="data:image/png;base64,{{ images['area_percentage'] }}" alt="Área Calentada">
-        </div>
-        <div class="grid-item">
-            <h3>Histograma de Temperaturas</h3>
-            <img src="data:image/png;base64,{{ images['histogram'] }}" alt="Histograma">
-        </div>
-        <div class="grid-item">
-            <h3>Mapa de Calor Final</h3>
-            <img src="data:image/png;base64,{{ images['heatmap'] }}" alt="Mapa de Calor">
-        </div>
+      <div class="grid-item">
+        <h3>Temperatura Promedio vs Tiempo</h3>
+        <img src="data:image/png;base64,{{ images['avg_temp'] }}" alt="Temperatura Promedio">
+      </div>
+      <div class="grid-item">
+        <h3>Área Calentada vs Tiempo</h3>
+        <img src="data:image/png;base64,{{ images['area_percentage'] }}" alt="Área Calentada">
+      </div>
+      <div class="grid-item">
+        <h3>Histograma de Temperaturas</h3>
+        <img src="data:image/png;base64,{{ images['histogram'] }}" alt="Histograma">
+      </div>
+      <div class="grid-item">
+        <h3>Mapa de Calor Final</h3>
+        <img src="data:image/png;base64,{{ images['heatmap'] }}" alt="Mapa de Calor">
+      </div>
     </div>
+  </main>
+  
+  <footer>
+    <p>&copy; 2025 Simulación de Transferencia de Calor</p>
+  </footer>
 </body>
-
 </html>

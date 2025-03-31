@@ -127,6 +127,7 @@ def show_graph():
     plt.xlabel("Temperatura (°C)")
     plt.ylabel("Número de celdas")
     plt.title("Histograma de Temperaturas")
+    plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
     buf = io.BytesIO()
     plt.savefig(buf, format='png')

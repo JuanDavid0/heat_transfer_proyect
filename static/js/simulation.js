@@ -1,9 +1,17 @@
 // static/js/simulation.js
+
 let canvas = document.getElementById("simCanvas");
 let ctx = canvas.getContext("2d");
 let cellSize = 10;
 let padding = 10;
 let simulationInterval = null;
+
+// Función para actualizar el valor mostrado junto a un slider
+function updateSliderValue(sliderId, outputId) {
+  let slider = document.getElementById(sliderId);
+  let output = document.getElementById(outputId);
+  output.innerText = slider.value;
+}
 
 function startSimulation() {
     let width = document.getElementById("width").value;
@@ -11,11 +19,11 @@ function startSimulation() {
     let alpha = document.getElementById("material").value;
     let heat_temp = document.getElementById("heat_temp").value;
     let ambient = document.getElementById("ambient").value;
-    let sim_speed = document.getElementById("sim_speed").value;
+    let sim_speed = document.getElementById("sim_speed_slider").value;
     let source_x = document.getElementById("source_x").value;
     let source_y = document.getElementById("source_y").value;
-    let dx = document.getElementById("dx").value; // nuevo campo
-    let dt = document.getElementById("dt").value; // nuevo campo
+    let dx = document.getElementById("dx_slider").value;
+    let dt = document.getElementById("dt_slider").value;
     let boundary = document.getElementById("boundary").value;
     
     fetch("/start", {
@@ -37,7 +45,7 @@ function startSimulation() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
+        //console.log(data);
         if(simulationInterval) clearInterval(simulationInterval);
         simulationInterval = setInterval(getStatus, 100);
     });
@@ -76,18 +84,15 @@ function getStatus() {
 function drawSimulation(matrix) {
     let rows = matrix.length;
     let cols = matrix[0].length;
-    
     canvas.width = cols * cellSize + 2 * padding;
     canvas.height = rows * cellSize + 2 * padding;
     
-    // Suponiendo que la temperatura ambiente y de la fuente son fijas (20 y, por ejemplo, 200)
-    let ambient = 20;
-    let heat_temp = 200;
+    let ambient = parseFloat(document.getElementById("ambient").value);
+    let heat_temp = parseFloat(document.getElementById("heat_temp").value);
     
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
+    for (let i = 0; i < rows; i++){
+        for (let j = 0; j < cols; j++){
             let temp = matrix[i][j];
-            // Normalización fija: con ambient y heat_temp
             let t_norm = (temp - ambient) / (heat_temp - ambient);
             t_norm = Math.min(Math.max(t_norm, 0), 1);
             let color = temperatureToColor(t_norm);

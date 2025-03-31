@@ -1,69 +1,119 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html>
-
 <head>
-    <meta charset="utf-8">
-    <title>Simulación de Transferencia de Calor</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+  <meta charset="utf-8">
+  <title>Simulación de Transferencia de Calor</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
-
 <body>
+  <header>
     <h1>Simulación de Transferencia de Calor</h1>
-    <div id="config">
-        <label>Ancho (celdas): <input type="number" id="width" value="50"></label>
-        <label>Alto (celdas): <input type="number" id="height" value="50"></label>
-        <label>Material:
-            <select id="material">
-                <option value="0.8">Cobre</option>
-                <option value="0.3">Acero Inoxidable</option>
-                <option value="0.9">Aluminio</option>
-                <option value="0.95">Plata</option>
-                <option value="0.85">Oro</option>
-                <option value="0.5">Hierro</option>
-                <option value="0.4">Latón</option>
-                <option value="0.35">Bronce</option>
-                <option value="0.2">Vidrio</option>
-                <option value="0.1">Madera</option>
-            </select>
+  </header>
+  
+  <div class="container">
+    <!-- Sección de Configuración ocupará 25% -->
+    <section id="config">
+      <div class="config-group">
+        <h2>Dimensiones de la Placa</h2>
+        <label>
+          Ancho (celdas):
+          <input type="number" id="width" value="50" min="10">
         </label>
-        <label>Temperatura de la fuente: <input type="number" id="heat_temp" value="200"></label>
-        <label>Temperatura Ambiente:
-            <input type="number" id="ambient" value="20">
+        <label>
+          Alto (celdas):
+          <input type="number" id="height" value="50" min="10">
         </label>
-        <label>Posición de la Fuente (X):
-            <input type="number" id="source_x" value="25" min="0">
-        </label>
-        <label>Posición de la Fuente (Y):
-            <input type="number" id="source_y" value="25" min="0">
-        </label>
-        <label>Tamaño de la Celda (dx):
-            <input type="number" id="dx" value="1.0" step="0.1" min="0.1">
-        </label>
-        <label>Paso de Tiempo (dt):
-            <input type="number" id="dt" value="0.1" step="0.01" min="0.01">
-        </label>
-        <label>Condiciones de Contorno:
-            <select id="boundary">
-                <option value="Dirichlet">Dirichlet (fijas)</option>
-                <option value="Neumann" selected>Neumann (aisladas)</option>
-            </select>
-        </label>
+      </div>
 
-        <label>Velocidad de simulación: <input type="number" step="0.1" id="sim_speed" value="30"></label>
+      <div class="config-group">
+        <h2>Material y Temperaturas</h2>
+        <label>
+          Material:
+          <select id="material">
+            <option value="0.8">Cobre</option>
+            <option value="0.3">Acero Inoxidable</option>
+            <option value="0.9">Aluminio</option>
+            <option value="0.95">Plata</option>
+            <option value="0.85">Oro</option>
+            <option value="0.5">Hierro</option>
+            <option value="0.4">Latón</option>
+            <option value="0.35">Bronce</option>
+            <option value="0.2">Vidrio</option>
+            <option value="0.1">Madera</option>
+          </select>
+        </label>
+        <label>
+          Temperatura de la fuente (°C):
+          <input type="number" id="heat_temp" value="200">
+        </label>
+        <label>
+          Temperatura Ambiente (°C):
+          <input type="number" id="ambient" value="20">
+        </label>
+      </div>
+
+      <div class="config-group">
+        <h2>Fuente de Calor</h2>
+        <label>
+          Posición de la Fuente (X):
+          <input type="number" id="source_x" value="25" min="0">
+        </label>
+        <label>
+          Posición de la Fuente (Y):
+          <input type="number" id="source_y" value="25" min="0">
+        </label>
+      </div>
+
+      <div class="config-group">
+        <h2>Resolución y Tiempo</h2>
+        <label>
+          Tamaño de la Celda (dx):
+          <input type="range" id="dx_slider" min="0.1" max="5" step="0.1" value="1.0" oninput="updateSliderValue('dx_slider', 'dx_value')">
+          <span id="dx_value">1.0</span>
+        </label>
+        <label>
+          Paso de Tiempo (dt):
+          <input type="range" id="dt_slider" min="0.01" max="1" step="0.01" value="0.1" oninput="updateSliderValue('dt_slider', 'dt_value')">
+          <span id="dt_value">0.1</span>
+        </label>
+      </div>
+
+      <div class="config-group">
+        <h2>Condiciones y Velocidad</h2>
+        <label>
+          Condiciones de Contorno:
+          <select id="boundary">
+            <option value="Dirichlet">Dirichlet (fijas)</option>
+            <option value="Neumann" selected>Neumann (aisladas)</option>
+          </select>
+        </label>
+        <label>
+          Velocidad de Simulación:
+          <input type="range" id="sim_speed_slider" min="1" max="100" step="1" value="30" oninput="updateSliderValue('sim_speed_slider', 'sim_speed_value')">
+          <span id="sim_speed_value">30</span>
+        </label>
+      </div>
+
+      <div class="config-actions">
         <button onclick="startSimulation()">Iniciar Simulación</button>
         <button onclick="pauseSimulation()">Pausar</button>
         <button onclick="resumeSimulation()">Reanudar</button>
-        <button onclick="showGraph()">Ver Gráficos</button>
-    </div>
-    <div id="simulation">
-        <canvas id="simCanvas" width="520" height="520"></canvas>
-    </div>
-    <div id="info">
+        <button onclick="showGraph()">Ver Gráficas</button>
+      </div>
+    </section>
+
+    <!-- Sección de Simulación ocupará 75% -->
+    <section id="simulation-container">
+      <section id="simulation">
+        <canvas id="simCanvas"></canvas>
+      </section>
+      <section id="info">
         <p id="percentage">Área Calentada: 0%</p>
         <p id="time">Tiempo: 0.0 s</p>
-    </div>
-    <script src="{{ url_for('static', filename='js/simulation.js') }}"></script>
-</body>
+      </section>
+    </section>
+  </div>
 
+  <script src="{{ url_for('static', filename='js/simulation.js') }}"></script>
+</body>
 </html>
