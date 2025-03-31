@@ -8,9 +8,23 @@ let simulationInterval = null;
 
 // Función para actualizar el valor mostrado junto a un slider
 function updateSliderValue(sliderId, outputId) {
-  let slider = document.getElementById(sliderId);
-  let output = document.getElementById(outputId);
-  output.innerText = slider.value;
+    let slider = document.getElementById(sliderId);
+    let output = document.getElementById(outputId);
+    output.innerText = slider.value;
+}
+
+function centerSource() {
+    // Obtener los valores de ancho y alto
+    let width = parseInt(document.getElementById("width").value);
+    let height = parseInt(document.getElementById("height").value);
+
+    // Calcular la posición central
+    let centerX = Math.floor(width / 2);
+    let centerY = Math.floor(height / 2);
+
+    // Actualizar los inputs de la posición de la fuente
+    document.getElementById("source_x").value = centerX;
+    document.getElementById("source_y").value = centerY;
 }
 
 function startSimulation() {
@@ -25,10 +39,33 @@ function startSimulation() {
     let dx = document.getElementById("dx_slider").value;
     let dt = document.getElementById("dt_slider").value;
     let boundary = document.getElementById("boundary").value;
-    
+
+
+    // Validar que la posición de la fuente no exceda las dimensiones de la placa
+    if (source_x > width) {
+        alert("La posición de la fuente (X) excede el ancho de la placa. El valor máximo es " + width + ".");
+        return;
+    }
+    if (source_y > height) {
+        alert("La posición de la fuente (Y) excede el alto de la placa. El valor máximo es " + height + ".");
+        return;
+    }
+
+    // Calcula dt_max con un factor de seguridad (por ejemplo, 0.9)
+    let safetyFactor = 0.9;
+    let dt_max = safetyFactor * (dx * dx) / (4 * alpha);
+
+    //Verifica que el dt seleccionado sea menor o igual al valor máximo permitido
+    if (dt > dt_max) {
+        alert("El paso de tiempo (dt) es demasiado grande para la resolución espacial y el coeficiente térmico seleccionados.\n" +
+            "Por favor, reduzca dt o aumente dx.\n" +
+            "dt_max aproximado: " + dt_max.toFixed(4));
+        return; // No se inicia la simulación
+    }
+
     fetch("/start", {
         method: "POST",
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             width: width,
             height: height,
@@ -43,42 +80,42 @@ function startSimulation() {
             boundary: boundary
         })
     })
-    .then(response => response.json())
-    .then(data => {
-        //console.log(data);
-        if(simulationInterval) clearInterval(simulationInterval);
-        simulationInterval = setInterval(getStatus, 100);
-    });
+        .then(response => response.json())
+        .then(data => {
+            //console.log(data);
+            if (simulationInterval) clearInterval(simulationInterval);
+            simulationInterval = setInterval(getStatus, 100);
+        });
 }
 
 function pauseSimulation() {
     fetch("/pause", { method: "POST" })
-    .then(response => response.json())
-    .then(data => console.log(data));
+        .then(response => response.json())
+        .then(data => console.log(data));
 }
 
 function resumeSimulation() {
     fetch("/resume", { method: "POST" })
-    .then(response => response.json())
-    .then(data => console.log(data));
+        .then(response => response.json())
+        .then(data => console.log(data));
 }
 
 function getStatus() {
     fetch("/status")
-    .then(response => response.json())
-    .then(data => {
-        if(data.error) {
-            clearInterval(simulationInterval);
-            return;
-        }
-        drawSimulation(data.matrix);
-        document.getElementById("percentage").innerText = "Área Calentada: " + data.percentage.toFixed(1) + "%";
-        document.getElementById("time").innerText = "Tiempo: " + data.time.toFixed(1) + " s";
-        if(!data.running) {
-            clearInterval(simulationInterval);
-            alert("Simulación finalizada: El calor se ha distribuido uniformemente.");
-        }
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                clearInterval(simulationInterval);
+                return;
+            }
+            drawSimulation(data.matrix);
+            document.getElementById("percentage").innerText = "Área Calentada: " + data.percentage.toFixed(1) + "%";
+            document.getElementById("time").innerText = "Tiempo: " + data.time.toFixed(1) + " s";
+            if (!data.running) {
+                clearInterval(simulationInterval);
+                alert("Simulación finalizada: El calor se ha distribuido uniformemente.");
+            }
+        });
 }
 
 function drawSimulation(matrix) {
@@ -86,12 +123,12 @@ function drawSimulation(matrix) {
     let cols = matrix[0].length;
     canvas.width = cols * cellSize + 2 * padding;
     canvas.height = rows * cellSize + 2 * padding;
-    
+
     let ambient = parseFloat(document.getElementById("ambient").value);
     let heat_temp = parseFloat(document.getElementById("heat_temp").value);
-    
-    for (let i = 0; i < rows; i++){
-        for (let j = 0; j < cols; j++){
+
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
             let temp = matrix[i][j];
             let t_norm = (temp - ambient) / (heat_temp - ambient);
             t_norm = Math.min(Math.max(t_norm, 0), 1);
@@ -103,26 +140,47 @@ function drawSimulation(matrix) {
 }
 
 function temperatureToColor(t_norm) {
+    // Aseguramos que t_norm esté en el rango [0, 1]
     t_norm = Math.max(0, Math.min(1, t_norm));
     let r, g, b;
-    if (t_norm < 0.5) {
-        let ratio = t_norm / 0.5;
+    
+    if (t_norm <= 0.25) {
+        // De azul (0,0,255) a cian (0,255,255)
+        let ratio = t_norm / 0.25;
         r = 0;
         g = Math.floor(ratio * 255);
         b = 255;
-    } else if (t_norm < 0.8) {
-        let ratio = (t_norm - 0.5) / (0.8 - 0.5);
-        r = Math.floor(ratio * 255);
+    } else if (t_norm <= 0.5) {
+        // De cian (0,255,255) a verde (0,255,0)
+        let ratio = (t_norm - 0.25) / 0.25;
+        r = 0;
         g = 255;
         b = Math.floor((1 - ratio) * 255);
-    } else {
-        let ratio = (t_norm - 0.8) / (1 - 0.8);
+    } else if (t_norm <= 0.75) {
+        // De verde (0,255,0) a amarillo (255,255,0)
+        let ratio = (t_norm - 0.5) / 0.25;
+        r = Math.floor(ratio * 255);
+        g = 255;
+        b = 0;
+    } else if (t_norm <= 0.9) {
+        // De amarillo (255,255,0) a naranja intermedio (255,180,0)
+        let ratio = (t_norm - 0.75) / 0.15; // subintervalo de 0.75 a 0.9
         r = 255;
-        g = Math.floor((1 - ratio) * 255);
+        // Interpolación de verde: de 255 a 180
+        g = Math.floor(255 - ratio * (255 - 180));
+        b = 0;
+    } else {
+        // De naranja intermedio (255,180,0) a rojo (255,0,0)
+        let ratio = (t_norm - 0.9) / 0.1; // subintervalo de 0.9 a 1.0
+        r = 255;
+        // Interpolación de verde: de 180 a 0
+        g = Math.floor(180 - ratio * 180);
         b = 0;
     }
+    
     return "rgb(" + r + "," + g + "," + b + ")";
 }
+
 
 function showGraph() {
     window.open("/graph", "_blank");
