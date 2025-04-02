@@ -1,21 +1,72 @@
 // static/js/simulation.js
 
+// Variables globales y contexto del canvas
 let canvas = document.getElementById("simCanvas");
-// Agrega listeners para actualizar dinámicamente los límites cuando cambien los inputs de ancho y alto
-document.getElementById("width").addEventListener("change", updateSourceLimits);
-document.getElementById("height").addEventListener("change", updateSourceLimits);
-
 let ctx = canvas.getContext("2d");
 let cellSize = 10;
 let padding = 10;
 let simulationInterval = null;
 
-// Llamar una vez al inicio para establecer los límites correctamente
+// ====================
+// Funciones de UI (Botones y Sliders)
+// ====================
+
+/**
+ * Actualiza el valor mostrado junto a un slider.
+ * @param {string} sliderId - ID del slider.
+ * @param {string} outputId - ID del elemento donde se muestra el valor.
+ */
+function updateSliderValue(sliderId, outputId) {
+    let slider = document.getElementById(sliderId);
+    let output = document.getElementById(outputId);
+    output.innerText = slider.value;
+}
+
+/**
+ * Actualiza los límites máximos de los inputs de la fuente (source_x y source_y)
+ * según los valores actuales de width y height.
+ */
+function updateSourceLimits() {
+    let width = parseInt(document.getElementById("width").value);
+    let height = parseInt(document.getElementById("height").value);
+    let sourceXInput = document.getElementById("source_x");
+    let sourceYInput = document.getElementById("source_y");
+
+    sourceXInput.max = width;
+    sourceYInput.max = height;
+
+    let sourceX = parseInt(sourceXInput.value);
+    let sourceY = parseInt(sourceYInput.value);
+    if (sourceX > width) {
+        sourceXInput.value = Math.floor(width / 2);
+    }
+    if (sourceY > height) {
+        sourceYInput.value = Math.floor(height / 2);
+    }
+}
+
+/**
+ * Centra la fuente de calor según el ancho y alto de la placa.
+ */
+function centerSource() {
+    let width = parseInt(document.getElementById("width").value);
+    let height = parseInt(document.getElementById("height").value);
+    let centerX = Math.floor(width / 2);
+    let centerY = Math.floor(height / 2);
+    document.getElementById("source_x").value = centerX;
+    document.getElementById("source_y").value = centerY;
+}
+
+// Inicializar límites de fuente al cargar y cuando cambien width/height
+document.getElementById("width").addEventListener("change", updateSourceLimits);
+document.getElementById("height").addEventListener("change", updateSourceLimits);
 updateSourceLimits();
 
-
+/**
+ * Establece el estado (habilitado/deshabilitado) de los botones.
+ * @param {Object} states - Objeto con propiedades start, pause, resume, graph, restart (true: habilitado).
+ */
 function setButtonStates(states) {
-    // states: objeto con propiedades start, pause, resume, graph, restart (true: enabled, false: disabled)
     document.getElementById("startBtn").disabled = !states.start;
     document.getElementById("pauseBtn").disabled = !states.pause;
     document.getElementById("resumeBtn").disabled = !states.resume;
@@ -23,28 +74,15 @@ function setButtonStates(states) {
     document.getElementById("restartBtn").disabled = !states.restart;
 }
 
-// Función para actualizar el valor mostrado junto a un slider
-function updateSliderValue(sliderId, outputId) {
-    let slider = document.getElementById(sliderId);
-    let output = document.getElementById(outputId);
-    output.innerText = slider.value;
-}
+// ====================
+// Funciones de Comunicación con el Backend
+// ====================
 
-function centerSource() {
-    // Obtener los valores de ancho y alto
-    let width = parseInt(document.getElementById("width").value);
-    let height = parseInt(document.getElementById("height").value);
-
-    // Calcular la posición central
-    let centerX = Math.floor(width / 2);
-    let centerY = Math.floor(height / 2);
-
-    // Actualizar los inputs de la posición de la fuente
-    document.getElementById("source_x").value = centerX;
-    document.getElementById("source_y").value = centerY;
-}
-
+/**
+ * Inicia la simulación, validando los parámetros antes de enviarlos.
+ */
 function startSimulation() {
+    // Extraer y convertir parámetros
     let width = parseInt(document.getElementById("width").value);
     let height = parseInt(document.getElementById("height").value);
     let alpha = parseFloat(document.getElementById("material").value);
@@ -57,7 +95,7 @@ function startSimulation() {
     let dt = parseFloat(document.getElementById("dt_slider").value);
     let boundary = document.getElementById("boundary").value;
 
-    // Validar que la posición de la fuente no exceda las dimensiones de la placa
+    // Validar posición de la fuente
     if (source_x > width) {
         alert("La posición de la fuente (X) excede el ancho de la placa. El valor máximo es " + width + ".");
         return;
@@ -67,19 +105,18 @@ function startSimulation() {
         return;
     }
 
-    // Calcula dt_max con un factor de seguridad
+    // Validar dt según la condición de estabilidad: dt_max = safetyFactor * dx^2/(4*alpha)
     let safetyFactor = 0.9;
     let dt_max = safetyFactor * (dx * dx) / (4 * alpha);
-
-    // Verifica que el dt seleccionado sea menor o igual al valor máximo permitido
     if (dt > dt_max) {
         alert("El paso de tiempo (dt) es demasiado grande para la resolución espacial y el coeficiente térmico seleccionados.\n" +
-            "Por favor, reduzca dt o aumente dx.\n" +
-            "dt_max aproximado: " + dt_max.toFixed(4));
-        return; // No se inicia la simulación
+              "Por favor, reduzca dt o aumente dx.\n" +
+              "dt_max aproximado: " + dt_max.toFixed(4));
+        return;
     }
 
-    setButtonStates({start: false, pause: true, resume: false, graph: false, restart: true});
+    // Actualizar estado de botones: desactivar "Iniciar" y "Reanudar", activar "Pausar" y "Reiniciar"
+    setButtonStates({ start: false, pause: true, resume: false, graph: false, restart: true });
 
     fetch("/start", {
         method: "POST",
@@ -105,45 +142,65 @@ function startSimulation() {
     });
 }
 
+/**
+ * Envía una solicitud para pausar la simulación.
+ */
 function pauseSimulation() {
     fetch("/pause", { method: "POST" })
     .then(response => response.json())
     .then(data => {
-        setButtonStates({start: false, pause: false, resume: true, graph: false, restart: true});
+        setButtonStates({ start: false, pause: false, resume: true, graph: false, restart: true });
     });
 }
 
+/**
+ * Envía una solicitud para reanudar la simulación.
+ */
 function resumeSimulation() {
     fetch("/resume", { method: "POST" })
     .then(response => response.json())
     .then(data => {
-        setButtonStates({start: false, pause: true, resume: false, graph: false, restart: true});
+        setButtonStates({ start: false, pause: true, resume: false, graph: false, restart: true });
     });
 }
 
+/**
+ * Reinicia la simulación recargando la página.
+ */
 function restartSimulation() {
     location.reload();
 }
 
+/**
+ * Consulta el estado actual de la simulación y actualiza la interfaz.
+ */
 function getStatus() {
     fetch("/status")
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                clearInterval(simulationInterval);
-                return;
-            }
-            drawSimulation(data.matrix);
-            document.getElementById("percentage").innerText = "Área Calentada: " + data.percentage.toFixed(1) + "%";
-            document.getElementById("time").innerText = "Tiempo: " + data.time.toFixed(1) + " s";
-            if (!data.running) {
-                clearInterval(simulationInterval);
-                setButtonStates({start: false, pause: false, resume: false, graph: true, restart: true});
-                alert("Simulación finalizada: El calor se ha distribuido uniformemente.");
-            }
-        });
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            clearInterval(simulationInterval);
+            return;
+        }
+        drawSimulation(data.matrix);
+        document.getElementById("percentage").innerText = "Área Calentada: " + data.percentage.toFixed(1) + "%";
+        document.getElementById("time").innerText = "Tiempo: " + data.time.toFixed(1) + " s";
+        if (!data.running) {
+            clearInterval(simulationInterval);
+            setButtonStates({ start: false, pause: false, resume: false, graph: true, restart: true });
+            alert("Simulación finalizada: El calor se ha distribuido uniformemente.");
+        }
+    });
 }
 
+// ====================
+// Funciones de Dibujo y Mapeo de Colores
+// ====================
+
+/**
+ * Dibuja la simulación en el canvas.
+ * @param {Array} matrix - Matriz de temperaturas.
+ */
 function drawSimulation(matrix) {
     let rows = matrix.length;
     let cols = matrix[0].length;
@@ -153,8 +210,8 @@ function drawSimulation(matrix) {
     let ambient = parseFloat(document.getElementById("ambient").value);
     let heat_temp = parseFloat(document.getElementById("heat_temp").value);
 
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
+    for (let i = 0; i < rows; i++){
+        for (let j = 0; j < cols; j++){
             let temp = matrix[i][j];
             let t_norm = (temp - ambient) / (heat_temp - ambient);
             t_norm = Math.min(Math.max(t_norm, 0), 1);
@@ -165,8 +222,13 @@ function drawSimulation(matrix) {
     }
 }
 
+/**
+ * Mapea el valor normalizado de temperatura (entre 0 y 1) a un color RGB.
+ * La función define varios tramos para diferenciar mejor las temperaturas altas.
+ * @param {number} t_norm - Valor normalizado.
+ * @returns {string} - Cadena de color en formato RGB.
+ */
 function temperatureToColor(t_norm) {
-    // Aseguramos que t_norm esté en el rango [0, 1]
     t_norm = Math.max(0, Math.min(1, t_norm));
     let r, g, b;
     
@@ -190,44 +252,23 @@ function temperatureToColor(t_norm) {
         b = 0;
     } else if (t_norm <= 0.9) {
         // De amarillo (255,255,0) a naranja intermedio (255,180,0)
-        let ratio = (t_norm - 0.75) / 0.15; // subintervalo de 0.75 a 0.9
+        let ratio = (t_norm - 0.75) / 0.15;
         r = 255;
-        // Interpolación de verde: de 255 a 180
         g = Math.floor(255 - ratio * (255 - 180));
         b = 0;
     } else {
         // De naranja intermedio (255,180,0) a rojo (255,0,0)
-        let ratio = (t_norm - 0.9) / 0.1; // subintervalo de 0.9 a 1.0
+        let ratio = (t_norm - 0.9) / 0.1;
         r = 255;
-        // Interpolación de verde: de 180 a 0
         g = Math.floor(180 - ratio * 180);
         b = 0;
     }
-    
     return "rgb(" + r + "," + g + "," + b + ")";
 }
 
-
+/**
+ * Abre la ventana de gráficas.
+ */
 function showGraph() {
     window.open("/graph", "_blank");
-}
-
-function updateSourceLimits() {
-    let width = parseInt(document.getElementById("width").value);
-    let height = parseInt(document.getElementById("height").value);
-    let sourceXInput = document.getElementById("source_x");
-    let sourceYInput = document.getElementById("source_y");
-    
-    // Establece el valor máximo de source_x y source_y basado en width y height
-    sourceXInput.max = width;
-    sourceYInput.max = height;
-
-    let sourceX = parseInt(sourceXInput.value);
-    let sourceY = parseInt(sourceYInput.value);
-    if (sourceX > width) {
-        sourceXInput.value = Math.floor(width / 2);
-    }
-    if (sourceY > height) {
-        sourceYInput.value = Math.floor(height / 2);
-    }
 }
