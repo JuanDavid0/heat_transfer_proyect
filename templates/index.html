@@ -101,13 +101,13 @@
       </div>
 
       <div class="config-actions">
-        <button onclick="startSimulation()">Iniciar Simulación</button>
-        <button onclick="pauseSimulation()">Pausar</button>
-        <button onclick="resumeSimulation()">Reanudar</button>
-        <button onclick="showGraph()">Ver Gráficas</button>
+        <button id="startBtn" onclick="startSimulation()">Iniciar Simulación</button>
+        <button id="pauseBtn" onclick="pauseSimulation()">Pausar</button>
+        <button id="resumeBtn" onclick="resumeSimulation()">Reanudar</button>
+        <button id="graphBtn" onclick="showGraph()">Ver Gráficas</button>
+        <button id="restartBtn" onclick="restartSimulation()">Reiniciar</button>
       </div>
     </section>
-
     <!-- Sección de Simulación ocupará 75% -->
     <section id="simulation-container">
       <section id="simulation">

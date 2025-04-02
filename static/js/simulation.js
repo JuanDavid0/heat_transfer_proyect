@@ -13,6 +13,16 @@ let simulationInterval = null;
 // Llamar una vez al inicio para establecer los límites correctamente
 updateSourceLimits();
 
+
+function setButtonStates(states) {
+    // states: objeto con propiedades start, pause, resume, graph, restart (true: enabled, false: disabled)
+    document.getElementById("startBtn").disabled = !states.start;
+    document.getElementById("pauseBtn").disabled = !states.pause;
+    document.getElementById("resumeBtn").disabled = !states.resume;
+    document.getElementById("graphBtn").disabled = !states.graph;
+    document.getElementById("restartBtn").disabled = !states.restart;
+}
+
 // Función para actualizar el valor mostrado junto a un slider
 function updateSliderValue(sliderId, outputId) {
     let slider = document.getElementById(sliderId);
@@ -57,7 +67,7 @@ function startSimulation() {
         return;
     }
 
-    // Calcula dt_max con un factor de seguridad (por ejemplo, 0.9)
+    // Calcula dt_max con un factor de seguridad
     let safetyFactor = 0.9;
     let dt_max = safetyFactor * (dx * dx) / (4 * alpha);
 
@@ -68,6 +78,8 @@ function startSimulation() {
             "dt_max aproximado: " + dt_max.toFixed(4));
         return; // No se inicia la simulación
     }
+
+    setButtonStates({start: false, pause: true, resume: false, graph: false, restart: true});
 
     fetch("/start", {
         method: "POST",
@@ -95,14 +107,22 @@ function startSimulation() {
 
 function pauseSimulation() {
     fetch("/pause", { method: "POST" })
-        .then(response => response.json())
-        .then(data => console.log(data));
+    .then(response => response.json())
+    .then(data => {
+        setButtonStates({start: false, pause: false, resume: true, graph: false, restart: true});
+    });
 }
 
 function resumeSimulation() {
     fetch("/resume", { method: "POST" })
-        .then(response => response.json())
-        .then(data => console.log(data));
+    .then(response => response.json())
+    .then(data => {
+        setButtonStates({start: false, pause: true, resume: false, graph: false, restart: true});
+    });
+}
+
+function restartSimulation() {
+    location.reload();
 }
 
 function getStatus() {
@@ -118,6 +138,7 @@ function getStatus() {
             document.getElementById("time").innerText = "Tiempo: " + data.time.toFixed(1) + " s";
             if (!data.running) {
                 clearInterval(simulationInterval);
+                setButtonStates({start: false, pause: false, resume: false, graph: true, restart: true});
                 alert("Simulación finalizada: El calor se ha distribuido uniformemente.");
             }
         });
