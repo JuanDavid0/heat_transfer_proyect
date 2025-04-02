@@ -1,10 +1,17 @@
 // static/js/simulation.js
 
 let canvas = document.getElementById("simCanvas");
+// Agrega listeners para actualizar dinámicamente los límites cuando cambien los inputs de ancho y alto
+document.getElementById("width").addEventListener("change", updateSourceLimits);
+document.getElementById("height").addEventListener("change", updateSourceLimits);
+
 let ctx = canvas.getContext("2d");
 let cellSize = 10;
 let padding = 10;
 let simulationInterval = null;
+
+// Llamar una vez al inicio para establecer los límites correctamente
+updateSourceLimits();
 
 // Función para actualizar el valor mostrado junto a un slider
 function updateSliderValue(sliderId, outputId) {
@@ -28,18 +35,17 @@ function centerSource() {
 }
 
 function startSimulation() {
-    let width = document.getElementById("width").value;
-    let height = document.getElementById("height").value;
-    let alpha = document.getElementById("material").value;
-    let heat_temp = document.getElementById("heat_temp").value;
-    let ambient = document.getElementById("ambient").value;
-    let sim_speed = document.getElementById("sim_speed_slider").value;
-    let source_x = document.getElementById("source_x").value;
-    let source_y = document.getElementById("source_y").value;
-    let dx = document.getElementById("dx_slider").value;
-    let dt = document.getElementById("dt_slider").value;
+    let width = parseInt(document.getElementById("width").value);
+    let height = parseInt(document.getElementById("height").value);
+    let alpha = parseFloat(document.getElementById("material").value);
+    let heat_temp = parseFloat(document.getElementById("heat_temp").value);
+    let ambient = parseFloat(document.getElementById("ambient").value);
+    let sim_speed = parseFloat(document.getElementById("sim_speed_slider").value);
+    let source_x = parseInt(document.getElementById("source_x").value);
+    let source_y = parseInt(document.getElementById("source_y").value);
+    let dx = parseFloat(document.getElementById("dx_slider").value);
+    let dt = parseFloat(document.getElementById("dt_slider").value);
     let boundary = document.getElementById("boundary").value;
-
 
     // Validar que la posición de la fuente no exceda las dimensiones de la placa
     if (source_x > width) {
@@ -55,7 +61,7 @@ function startSimulation() {
     let safetyFactor = 0.9;
     let dt_max = safetyFactor * (dx * dx) / (4 * alpha);
 
-    //Verifica que el dt seleccionado sea menor o igual al valor máximo permitido
+    // Verifica que el dt seleccionado sea menor o igual al valor máximo permitido
     if (dt > dt_max) {
         alert("El paso de tiempo (dt) es demasiado grande para la resolución espacial y el coeficiente térmico seleccionados.\n" +
             "Por favor, reduzca dt o aumente dx.\n" +
@@ -80,12 +86,11 @@ function startSimulation() {
             boundary: boundary
         })
     })
-        .then(response => response.json())
-        .then(data => {
-            //console.log(data);
-            if (simulationInterval) clearInterval(simulationInterval);
-            simulationInterval = setInterval(getStatus, 100);
-        });
+    .then(response => response.json())
+    .then(data => {
+        if (simulationInterval) clearInterval(simulationInterval);
+        simulationInterval = setInterval(getStatus, 100);
+    });
 }
 
 function pauseSimulation() {
@@ -184,4 +189,24 @@ function temperatureToColor(t_norm) {
 
 function showGraph() {
     window.open("/graph", "_blank");
+}
+
+function updateSourceLimits() {
+    let width = parseInt(document.getElementById("width").value);
+    let height = parseInt(document.getElementById("height").value);
+    let sourceXInput = document.getElementById("source_x");
+    let sourceYInput = document.getElementById("source_y");
+    
+    // Establece el valor máximo de source_x y source_y basado en width y height
+    sourceXInput.max = width;
+    sourceYInput.max = height;
+
+    let sourceX = parseInt(sourceXInput.value);
+    let sourceY = parseInt(sourceYInput.value);
+    if (sourceX > width) {
+        sourceXInput.value = Math.floor(width / 2);
+    }
+    if (sourceY > height) {
+        sourceYInput.value = Math.floor(height / 2);
+    }
 }

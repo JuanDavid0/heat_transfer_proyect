@@ -1,9 +1,11 @@
 # app.py
 from flask import Flask, render_template, request, jsonify
 import threading, time
-
 import matplotlib
+matplotlib.use('Agg')
 from simulation_engine import SimulationEngine
+import matplotlib.pyplot as plt
+import io, base64
 
 app = Flask(__name__)
 
@@ -81,10 +83,6 @@ def get_status():
             })
     else:
         return jsonify({"error": "No simulation running"})
-
-from flask import render_template, jsonify
-import matplotlib.pyplot as plt
-import io, base64
 
 @app.route('/graph', methods=['GET'])
 def show_graph():
