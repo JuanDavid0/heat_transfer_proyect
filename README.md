@@ -12,7 +12,7 @@ This project simulates heat transfer processes using numerical methods. Follow t
 ### 1. Clone the Repository
 Clone this repository to your local machine:
 ```bash
-git clone <repository-url>
+git clone <https://github.com/JuanDavid0/heat_transfer_proyect.git>
 cd heat_transfer_proyect
 ```
 
@@ -41,24 +41,11 @@ pip install -r requirements.txt
 ### 5. Run the Simulation
 Run the main script to start the simulation:
 ```bash
-python main.py
+python app.py
 ```
-
-## Project Structure
-- `main.py`: Entry point for the simulation.
-- `modules/`: Contains the core simulation logic and helper functions.
-- `data/`: Stores input and output data files.
-- `requirements.txt`: Lists the Python dependencies.
 
 ## Deactivating the Virtual Environment
 When you're done, deactivate the virtual environment:
 ```bash
 deactivate
 ```
-
-## Notes
-- Ensure all dependencies are installed before running the project.
-- Modify the `main.py` file to customize simulation parameters.
-
-## License
-This project is for educational purposes only.
