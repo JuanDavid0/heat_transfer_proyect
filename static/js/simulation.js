@@ -115,6 +115,8 @@ function startSimulation() {
         return;
     }
 
+    disableConfigPanel(); // Deshabilitar panel de configuración durante la simulación
+
     // Actualizar estado de botones: desactivar "Iniciar" y "Reanudar", activar "Pausar" y "Reiniciar"
     setButtonStates({ start: false, pause: true, resume: false, graph: false, restart: true });
 
@@ -150,6 +152,7 @@ function pauseSimulation() {
     .then(response => response.json())
     .then(data => {
         setButtonStates({ start: false, pause: false, resume: true, graph: false, restart: true });
+        enableSimSpeedControl();
     });
 }
 
@@ -157,10 +160,16 @@ function pauseSimulation() {
  * Envía una solicitud para reanudar la simulación.
  */
 function resumeSimulation() {
-    fetch("/resume", { method: "POST" })
+    let newSimSpeed = parseFloat(document.getElementById("sim_speed_slider").value);
+    fetch("/resume", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sim_speed: newSimSpeed })
+    })
     .then(response => response.json())
     .then(data => {
         setButtonStates({ start: false, pause: true, resume: false, graph: false, restart: true });
+        disableSimSpeedControl();
     });
 }
 
@@ -188,6 +197,7 @@ function getStatus() {
         if (!data.running) {
             clearInterval(simulationInterval);
             setButtonStates({ start: false, pause: false, resume: false, graph: true, restart: true });
+            enableConfigPanel(); // Habilitar panel de configuración al finalizar
             alert("Simulación finalizada: El calor se ha distribuido uniformemente.");
         }
     });
@@ -272,3 +282,33 @@ function temperatureToColor(t_norm) {
 function showGraph() {
     window.open("/graph", "_blank");
 }
+
+/**
+ * Deshabilita todos los elementos de entrada dentro del panel de configuración.
+ */
+function disableConfigPanel() {
+    const configElements = document.querySelectorAll("#config input, #config select, #config button");
+    configElements.forEach(el => {
+        el.disabled = true;
+    });
+}
+
+/**
+ * Habilita todos los elementos de entrada dentro del panel de configuración.
+ */
+function enableConfigPanel() {
+    const configElements = document.querySelectorAll("#config input, #config select, #config button");
+    configElements.forEach(el => {
+        el.disabled = false;
+    });
+}
+
+function enableSimSpeedControl() {
+    // Habilitar el slider y su etiqueta si fuera necesario
+    document.getElementById("sim_speed_slider").disabled = false;
+}
+
+function disableSimSpeedControl() {
+    document.getElementById("sim_speed_slider").disabled = true;
+}
+

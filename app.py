@@ -26,7 +26,7 @@ def run_simulation_thread(sim_speed):
                 if percentage >= 99.0:
                     simulation.running = False
                     break
-        time.sleep(0.05 / sim_speed)
+        time.sleep(0.05 / simulation.sim_speed)
 
 @app.route('/start', methods=['POST'])
 def start_simulation_endpoint():
@@ -65,9 +65,12 @@ def pause_simulation_endpoint():
     return jsonify({"status": "paused"})
 
 @app.route('/resume', methods=['POST'])
-def resume_simulation_endpoint():
+def resume_simulation():
     global simulation
     if simulation:
+        data = request.get_json()
+        if data and "sim_speed" in data:
+            simulation.sim_speed = float(data["sim_speed"])  # Actualizar la velocidad en la simulación
         with simulation_lock:
             simulation.paused = False
     return jsonify({"status": "resumed"})
